@@ -28,4 +28,13 @@ public class AccountController {
     public Account withdraw(@RequestBody TransactionDTO transactionDTO) {
         return accountService.withdraw(transactionDTO);
     }
+
+    @PostMapping("/transfer")
+    public Account transfer(
+            @RequestParam Long fromAccountId,
+            @RequestParam Long toAccountId,
+            @RequestParam Double amount) {
+
+        return accountService.transfer(fromAccountId, toAccountId, amount);
+    }
 }

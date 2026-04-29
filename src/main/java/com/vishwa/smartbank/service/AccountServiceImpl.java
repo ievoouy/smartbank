@@ -3,12 +3,15 @@ package com.vishwa.smartbank.service;
 import com.vishwa.smartbank.dto.AccountDTO;
 import com.vishwa.smartbank.dto.TransactionDTO;
 import com.vishwa.smartbank.entity.Account;
+import com.vishwa.smartbank.entity.Transaction;
 import com.vishwa.smartbank.entity.User;
 import com.vishwa.smartbank.repository.AccountRepository;
+import com.vishwa.smartbank.repository.TransactionRepository;
 import com.vishwa.smartbank.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Service
@@ -19,6 +22,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Override
     public Account createAccount(AccountDTO accountDTO) {
@@ -46,6 +52,14 @@ public class AccountServiceImpl implements AccountService {
 
         account.setBalance(account.getBalance() + transactionDTO.getAmount());
 
+        Transaction tx = new Transaction();
+        tx.setAmount(transactionDTO.getAmount());
+        tx.setType("DEPOSIT");
+        tx.setTimestamp(LocalDateTime.now());
+        tx.setDestinationAccount(account);
+
+        transactionRepository.save(tx);
+
         return accountRepository.save(account);
     }
 
@@ -61,6 +75,43 @@ public class AccountServiceImpl implements AccountService {
 
         account.setBalance(account.getBalance() - transactionDTO.getAmount());
 
+        Transaction tx = new Transaction();
+        tx.setAmount(transactionDTO.getAmount());
+        tx.setType("WITHDRAW");
+        tx.setTimestamp(LocalDateTime.now());
+        tx.setSourceAccount(account);
+
+        transactionRepository.save(tx);
+
         return accountRepository.save(account);
+    }
+
+    @Override
+    public Account transfer(Long fromAccountId, Long toAccountId, Double amount) {
+
+        Account fromAccount = accountRepository.findById(fromAccountId)
+                .orElseThrow(() -> new RuntimeException("Sender account not found"));
+
+        Account toAccount = accountRepository.findById(toAccountId)
+                .orElseThrow(() -> new RuntimeException("Receiver account not found"));
+
+        if (fromAccount.getBalance() < amount) {
+            throw new RuntimeException("Insufficient balance");
+        }
+
+        fromAccount.setBalance(fromAccount.getBalance() - amount);
+        toAccount.setBalance(toAccount.getBalance() + amount);
+
+        Transaction tx = new Transaction();
+        tx.setAmount(amount);
+        tx.setType("TRANSFER");
+        tx.setTimestamp(LocalDateTime.now());
+        tx.setSourceAccount(fromAccount);
+        tx.setDestinationAccount(toAccount);
+
+        transactionRepository.save(tx);
+
+        accountRepository.save(fromAccount);
+        return accountRepository.save(toAccount);
     }
 }
