@@ -1,6 +1,7 @@
 package com.vishwa.smartbank.controller;
 
 import com.vishwa.smartbank.dto.AccountDTO;
+import com.vishwa.smartbank.dto.TransactionDTO;
 import com.vishwa.smartbank.entity.Account;
 import com.vishwa.smartbank.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,5 +17,15 @@ public class AccountController {
     @PostMapping
     public Account createAccount(@RequestBody AccountDTO accountDTO) {
         return accountService.createAccount(accountDTO);
+    }
+
+    @PostMapping("/deposit")
+    public Account deposit(@RequestBody TransactionDTO transactionDTO) {
+        return accountService.deposit(transactionDTO);
+    }
+
+    @PostMapping("/withdraw")
+    public Account withdraw(@RequestBody TransactionDTO transactionDTO) {
+        return accountService.withdraw(transactionDTO);
     }
 }

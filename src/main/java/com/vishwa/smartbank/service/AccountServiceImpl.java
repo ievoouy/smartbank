@@ -1,6 +1,7 @@
 package com.vishwa.smartbank.service;
 
 import com.vishwa.smartbank.dto.AccountDTO;
+import com.vishwa.smartbank.dto.TransactionDTO;
 import com.vishwa.smartbank.entity.Account;
 import com.vishwa.smartbank.entity.User;
 import com.vishwa.smartbank.repository.AccountRepository;
@@ -33,6 +34,32 @@ public class AccountServiceImpl implements AccountService {
         // Generate random account number
         String accNumber = "SB" + (100000 + new Random().nextInt(900000));
         account.setAccountNumber(accNumber);
+
+        return accountRepository.save(account);
+    }
+
+    @Override
+    public Account deposit(TransactionDTO transactionDTO) {
+
+        Account account = accountRepository.findById(transactionDTO.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        account.setBalance(account.getBalance() + transactionDTO.getAmount());
+
+        return accountRepository.save(account);
+    }
+
+    @Override
+    public Account withdraw(TransactionDTO transactionDTO) {
+
+        Account account = accountRepository.findById(transactionDTO.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        if (account.getBalance() < transactionDTO.getAmount()) {
+            throw new RuntimeException("Insufficient balance");
+        }
+
+        account.setBalance(account.getBalance() - transactionDTO.getAmount());
 
         return accountRepository.save(account);
     }
