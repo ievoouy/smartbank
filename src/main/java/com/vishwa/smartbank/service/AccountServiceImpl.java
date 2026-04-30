@@ -12,6 +12,7 @@ import com.vishwa.smartbank.repository.TransactionRepository;
 import com.vishwa.smartbank.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -28,6 +29,7 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Transactional
     @Override
     public Account createAccount(AccountDTO accountDTO) {
 
@@ -46,6 +48,7 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.save(account);
     }
 
+    @Transactional
     @Override
     public Account deposit(TransactionDTO transactionDTO) {
 
@@ -65,6 +68,7 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.save(account);
     }
 
+    @Transactional
     @Override
     public Account withdraw(TransactionDTO transactionDTO) {
 
@@ -88,6 +92,7 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.save(account);
     }
 
+    @Transactional
     @Override
     public Account transfer(Long fromAccountId, Long toAccountId, Double amount) {
 
@@ -101,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
             throw new InsufficientBalanceException("Insufficient balance");
         }
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);
+        fromAccount.setBalance(fromAccount.getBalance() - amount);.
         toAccount.setBalance(toAccount.getBalance() + amount);
 
         Transaction tx = new Transaction();
