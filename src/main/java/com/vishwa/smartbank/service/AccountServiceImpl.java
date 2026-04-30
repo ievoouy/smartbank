@@ -5,6 +5,8 @@ import com.vishwa.smartbank.dto.TransactionDTO;
 import com.vishwa.smartbank.entity.Account;
 import com.vishwa.smartbank.entity.Transaction;
 import com.vishwa.smartbank.entity.User;
+import com.vishwa.smartbank.exception.InsufficientBalanceException;
+import com.vishwa.smartbank.exception.ResourceNotFoundException;
 import com.vishwa.smartbank.repository.AccountRepository;
 import com.vishwa.smartbank.repository.TransactionRepository;
 import com.vishwa.smartbank.repository.UserRepository;
@@ -30,7 +32,7 @@ public class AccountServiceImpl implements AccountService {
     public Account createAccount(AccountDTO accountDTO) {
 
         User user = userRepository.findById(accountDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Account account = new Account();
         account.setUser(user);
@@ -48,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
     public Account deposit(TransactionDTO transactionDTO) {
 
         Account account = accountRepository.findById(transactionDTO.getAccountId())
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
         account.setBalance(account.getBalance() + transactionDTO.getAmount());
 
@@ -67,10 +69,10 @@ public class AccountServiceImpl implements AccountService {
     public Account withdraw(TransactionDTO transactionDTO) {
 
         Account account = accountRepository.findById(transactionDTO.getAccountId())
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
         if (account.getBalance() < transactionDTO.getAmount()) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
 
         account.setBalance(account.getBalance() - transactionDTO.getAmount());
@@ -90,13 +92,13 @@ public class AccountServiceImpl implements AccountService {
     public Account transfer(Long fromAccountId, Long toAccountId, Double amount) {
 
         Account fromAccount = accountRepository.findById(fromAccountId)
-                .orElseThrow(() -> new RuntimeException("Sender account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sender account not found"));
 
         Account toAccount = accountRepository.findById(toAccountId)
-                .orElseThrow(() -> new RuntimeException("Receiver account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Receiver account not found"));
 
         if (fromAccount.getBalance() < amount) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
 
         fromAccount.setBalance(fromAccount.getBalance() - amount);
