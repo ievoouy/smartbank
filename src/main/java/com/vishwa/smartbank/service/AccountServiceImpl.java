@@ -106,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
             throw new InsufficientBalanceException("Insufficient balance");
         }
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);.
+        fromAccount.setBalance(fromAccount.getBalance() - amount);
         toAccount.setBalance(toAccount.getBalance() + amount);
 
         Transaction tx = new Transaction();

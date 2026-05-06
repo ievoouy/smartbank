@@ -2,6 +2,7 @@ package com.vishwa.smartbank.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -17,5 +18,7 @@ public class User {
 
     private String name;
     private String email;
+
+    @JsonIgnore
     private String password;
 }
