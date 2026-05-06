@@ -4,6 +4,7 @@ import com.vishwa.smartbank.dto.AccountDTO;
 import com.vishwa.smartbank.dto.TransactionDTO;
 import com.vishwa.smartbank.entity.Account;
 import com.vishwa.smartbank.service.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,17 +16,17 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping
-    public Account createAccount(@RequestBody AccountDTO accountDTO) {
+    public Account createAccount(@Valid @RequestBody AccountDTO accountDTO) {
         return accountService.createAccount(accountDTO);
     }
 
     @PostMapping("/deposit")
-    public Account deposit(@RequestBody TransactionDTO transactionDTO) {
+    public Account deposit(@Valid @RequestBody TransactionDTO transactionDTO) {
         return accountService.deposit(transactionDTO);
     }
 
     @PostMapping("/withdraw")
-    public Account withdraw(@RequestBody TransactionDTO transactionDTO) {
+    public Account withdraw(@Valid @RequestBody TransactionDTO transactionDTO) {
         return accountService.withdraw(transactionDTO);
     }
 
