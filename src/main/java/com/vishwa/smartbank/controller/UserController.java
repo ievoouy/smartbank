@@ -1,5 +1,7 @@
 package com.vishwa.smartbank.controller;
 
+import com.vishwa.smartbank.dto.LoginDTO;
+import com.vishwa.smartbank.dto.LoginResponseDTO;
 import com.vishwa.smartbank.dto.UserDTO;
 import com.vishwa.smartbank.entity.User;
 import com.vishwa.smartbank.service.UserService;
@@ -17,5 +19,10 @@ public class UserController {
     @PostMapping
     public User createUser(@Valid @RequestBody UserDTO userDTO) {
         return userService.createUser(userDTO);
+    }
+
+    @PostMapping("/login")
+    public LoginResponseDTO login(@RequestBody LoginDTO loginDTO) {
+        return userService.login(loginDTO);
     }
 }
