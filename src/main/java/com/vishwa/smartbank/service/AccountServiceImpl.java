@@ -127,4 +127,15 @@ public class AccountServiceImpl implements AccountService {
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }
+
+    @Override
+    public List<Account> getAccountsByUser(
+            String email
+    ) {
+
+        return accountRepository
+                .findByUserEmail(email);
+    }
+
+
 }

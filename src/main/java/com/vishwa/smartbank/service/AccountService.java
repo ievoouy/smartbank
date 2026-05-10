@@ -12,4 +12,5 @@ public interface AccountService {
     Account withdraw(TransactionDTO transactionDTO);
     Account transfer(Long fromAccountId, Long toAccountId, Double amount);
     List<Account> getAllAccounts();
+    List<Account> getAccountsByUser(String email);
 }

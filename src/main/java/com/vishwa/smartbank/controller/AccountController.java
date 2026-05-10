@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -42,7 +43,12 @@ public class AccountController {
     }
 
     @GetMapping
-    public List<Account> getAllAccounts() {
-        return accountService.getAllAccounts();
+    public List<Account> getUserAccounts(
+            Principal principal
+    ) {
+
+        return accountService.getAccountsByUser(
+                principal.getName()
+        );
     }
 }
