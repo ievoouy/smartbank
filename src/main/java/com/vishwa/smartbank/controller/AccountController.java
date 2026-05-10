@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
@@ -37,5 +39,10 @@ public class AccountController {
             @RequestParam Double amount) {
 
         return accountService.transfer(fromAccountId, toAccountId, amount);
+    }
+
+    @GetMapping
+    public List<Account> getAllAccounts() {
+        return accountService.getAllAccounts();
     }
 }

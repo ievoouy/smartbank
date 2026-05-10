@@ -1,27 +1,26 @@
 package com.vishwa.smartbank.security;
 
-import com.vishwa.smartbank.service.CustomUserDetailsService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -32,35 +31,41 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        String token = null;
-        String email = null;
+        // No token present
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
-            token = authHeader.substring(7);
-
-            email = jwtUtil.extractEmail(token);
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        if (email != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
 
-            UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(email);
+            String token = authHeader.substring(7);
 
-            UsernamePasswordAuthenticationToken authToken =
+            String email = jwtUtil.extractEmail(token);
+
+            UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            userDetails,
+                            email,
                             null,
-                            userDetails.getAuthorities()
+                            Collections.emptyList()
                     );
 
-            authToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
             );
 
             SecurityContextHolder.getContext()
-                    .setAuthentication(authToken);
+                    .setAuthentication(authentication);
+
+        } catch (JwtException e) {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            response.getWriter().write("Invalid or Expired Token");
+
+            return;
         }
 
         filterChain.doFilter(request, response);

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -120,5 +121,10 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.save(fromAccount);
         return accountRepository.save(toAccount);
+    }
+
+    @Override
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
     }
 }
